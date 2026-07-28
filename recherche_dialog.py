@@ -73,7 +73,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         self.colorCombo.setCurrentText(settings.value("geoban/marker_color", "Rouge", type=str))
         self.colorCombo.currentTextChanged.connect(self.on_color_changed)
         
-        self.opacitySlider = QSlider(Qt.Horizontal)
+        self.opacitySlider = QSlider(Qt.Orientation.Horizontal)
         self.opacitySlider.setRange(0, 100)
         self.opacitySlider.setValue(settings.value("geoban/polygon_opacity", 50, type=int))
         self.opacitySlider.valueChanged.connect(self.on_color_changed)
@@ -156,7 +156,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         self.history_tab = QWidget()
         self.history_layout = QVBoxLayout(self.history_tab)
         self.historyListWidget = QListWidget()
-        self.historyListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.historyListWidget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.history_layout.addWidget(self.historyListWidget)
         self.tabWidget.addTab(self.history_tab, "Historique")
         self.tabWidget.setTabIcon(4, QgsApplication.getThemeIcon("/mActionHistory.svg"))
@@ -244,8 +244,8 @@ class RechercheDialog(QDialog, FORM_CLASS):
         self.cadastre_address_timer.setSingleShot(True)
         self.cadastre_address_timer.timeout.connect(self.perform_search_cadastre_address_ban)
         
-        self.resultsListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.cadastreListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.resultsListWidget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.cadastreListWidget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         
         self.cadastreSearchModeCombo.currentIndexChanged.connect(self.on_cadastre_mode_changed)
         self.on_cadastre_mode_changed(0)
@@ -330,7 +330,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             label = props.get('label', 'Adresse inconnue')
             context = props.get('context', '')
             item = QListWidgetItem(f"{label} ({context})")
-            item.setData(Qt.UserRole, feature)
+            item.setData(Qt.ItemDataRole.UserRole, feature)
             self.resultsListWidget.addItem(item)
             
     def perform_search_cadastre(self):
@@ -381,11 +381,11 @@ class RechercheDialog(QDialog, FORM_CLASS):
         for feature in features:
             label = feature.get('properties', {}).get('label', 'Sans label')
             item = QListWidgetItem(label)
-            item.setData(Qt.UserRole, feature)
+            item.setData(Qt.ItemDataRole.UserRole, feature)
             self.cadastreAddressListWidget.addItem(item)
             
     def on_cadastre_address_selected(self, item):
-        feature = item.data(Qt.UserRole)
+        feature = item.data(Qt.ItemDataRole.UserRole)
         if not feature: return
         
         geom = feature.get('geometry', {})
@@ -433,7 +433,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
                 texte += f" - {contenance} m²"
                 
             item = QListWidgetItem(texte)
-            item.setData(Qt.UserRole, feature)
+            item.setData(Qt.ItemDataRole.UserRole, feature)
             self.cadastreListWidget.addItem(item)
             
     def on_search_error(self, error_msg):
@@ -478,7 +478,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
 
     def on_selection_changed(self):
         selected = self.get_selected_items()
-        has_selection = bool(selected and selected[0].data(Qt.UserRole))
+        has_selection = bool(selected and selected[0].data(Qt.ItemDataRole.UserRole))
         
         self.zoomButton.setEnabled(has_selection)
         self.exportLayerButton.setEnabled(has_selection)
@@ -495,7 +495,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         # Update Geometry Stats
         if has_selection and len(selected) == 1:
-            geom_dict = selected[0].data(Qt.UserRole).get('geometry', {})
+            geom_dict = selected[0].data(Qt.ItemDataRole.UserRole).get('geometry', {})
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -521,7 +521,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         # Details Label
         if has_selection and len(selected) == 1:
-            props = selected[0].data(Qt.UserRole).get('properties', {})
+            props = selected[0].data(Qt.ItemDataRole.UserRole).get('properties', {})
             contenance = props.get('contenance', None)
             if contenance:
                 self.detailsLabel.setText(f"Détails : Contenance de {contenance} m²")
@@ -584,7 +584,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             item = selected_items[0]
             if self.historyListWidget.count() == 0 or self.historyListWidget.item(0).text() != item.text():
                 new_item = QListWidgetItem(item.text())
-                new_item.setData(Qt.UserRole, item.data(Qt.UserRole))
+                new_item.setData(Qt.ItemDataRole.UserRole, item.data(Qt.ItemDataRole.UserRole))
                 self.historyListWidget.insertItem(0, new_item)
                 if self.historyListWidget.count() > 20:
                     self.historyListWidget.takeItem(20)
@@ -606,7 +606,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         has_polygons = False
         
         for item in selected_items:
-            feature = item.data(Qt.UserRole)
+            feature = item.data(Qt.ItemDataRole.UserRole)
             if not feature:
                 continue
                 
@@ -636,14 +636,14 @@ class RechercheDialog(QDialog, FORM_CLASS):
                         marker.setCenter(point_map)
                         marker.setColor(self.marker_color)
                         marker.setPenWidth(3)
-                        marker.setIconType(QgsVertexMarker.ICON_CROSS)
+                        marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
                         marker.setIconSize(15)
                     marker.setVisible(self.toggleVisibilityCheckbox.isChecked())
                     self.markers.append(marker)
                     
                 elif qgs_geom.type() in (1, 2): # Line or Polygon
                     has_polygons = True
-                    rb = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
+                    rb = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.GeometryType.PolygonGeometry)
                     rb.setToGeometry(qgs_geom, None)
                     rb.setColor(self.marker_color)
                     rb.setWidth(3)
@@ -696,7 +696,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             self.marker.setCenter(point_map)
             self.marker.setColor(marker_color)
             self.marker.setPenWidth(3)
-            self.marker.setIconType(QgsVertexMarker.ICON_CROSS)
+            self.marker.setIconType(QgsVertexMarker.IconType.ICON_CROSS)
             self.marker.setIconSize(15)
             
         self.marker.setVisible(self.toggleVisibilityCheckbox.isChecked())
@@ -718,7 +718,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             layer_name = "Sélection GeoBan"
             
         # Determine geometry type from the first item
-        feature_data = selected[0].data(Qt.UserRole)
+        feature_data = selected[0].data(Qt.ItemDataRole.UserRole)
         geom_dict = feature_data.get('geometry', {})
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
         if not ogr_geom:
@@ -735,7 +735,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         features_to_add = []
         for item in selected:
-            feat_data = item.data(Qt.UserRole)
+            feat_data = item.data(Qt.ItemDataRole.UserRole)
             if not feat_data:
                 continue
             geom_dict = feat_data.get('geometry', {})
@@ -765,7 +765,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             
         coords_list = []
         for item in selected:
-            geom_dict = item.data(Qt.UserRole).get('geometry', {})
+            geom_dict = item.data(Qt.ItemDataRole.UserRole).get('geometry', {})
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -791,7 +791,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             
         keys = set()
         for item in selected:
-            keys.update(item.data(Qt.UserRole).get('properties', {}).keys())
+            keys.update(item.data(Qt.ItemDataRole.UserRole).get('properties', {}).keys())
         keys = list(keys)
 
         filepath, _ = QFileDialog.getSaveFileName(self, "Exporter en CSV", "", "CSV Files (*.csv)")
@@ -802,7 +802,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
                     writer = csv.writer(f)
                     writer.writerow(["ID", "Label", "Longitude", "Latitude"] + keys)
                     for item in selected:
-                        feature = item.data(Qt.UserRole)
+                        feature = item.data(Qt.ItemDataRole.UserRole)
                         feat_id = feature.get('properties', {}).get('id', '')
                         label = feature.get('properties', {}).get('label', 'Inconnu')
                         geom = feature.get('geometry', {})
@@ -830,7 +830,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         if not selected:
             return
             
-        feature_data = selected[0].data(Qt.UserRole)
+        feature_data = selected[0].data(Qt.ItemDataRole.UserRole)
         geom_dict = feature_data.get('geometry', {})
         
         # Fallback to feature coordinates
@@ -917,7 +917,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         if not selected:
             return
             
-        feature_data = selected[0].data(Qt.UserRole)
+        feature_data = selected[0].data(Qt.ItemDataRole.UserRole)
         geom = feature_data.get('geometry', {})
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom))
         if ogr_geom:
@@ -932,7 +932,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         if not selected:
             return
             
-        feature_data = selected[0].data(Qt.UserRole)
+        feature_data = selected[0].data(Qt.ItemDataRole.UserRole)
         geojson_str = json.dumps(feature_data, indent=2, ensure_ascii=False)
         QApplication.clipboard().setText(geojson_str)
         self.iface.messageBar().pushMessage("Copié", "GeoJSON copié dans le presse-papiers.", level=0, duration=2)
@@ -949,7 +949,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         extent = self.iface.mapCanvas().extent()
         crs = self.iface.mapCanvas().mapSettings().destinationCrs()
         
-        name, ok = QInputDialog.getText(self, "Signet Spatial", "Nom du signet :", QLineEdit.Normal, selected[0].text())
+        name, ok = QInputDialog.getText(self, "Signet Spatial", "Nom du signet :", QLineEdit.EchoMode.Normal, selected[0].text())
         if ok and name:
             bookmark_manager = QgsProject.instance().bookmarkManager()
             bookmark = QgsBookmark()
@@ -981,7 +981,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         features_to_add = []
         for item in selected:
-            geom_dict = item.data(Qt.UserRole).get('geometry', {})
+            geom_dict = item.data(Qt.ItemDataRole.UserRole).get('geometry', {})
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -1013,7 +1013,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         if filepath:
             from qgis.core import QgsVectorFileWriter, QgsCoordinateTransformContext
             
-            geom_type = "Polygon" if selected[0].data(Qt.UserRole).get('geometry', {}).get('type') in ('Polygon', 'MultiPolygon') else "Point"
+            geom_type = "Polygon" if selected[0].data(Qt.ItemDataRole.UserRole).get('geometry', {}).get('type') in ('Polygon', 'MultiPolygon') else "Point"
             temp_layer = QgsVectorLayer(f"{geom_type}?crs=EPSG:4326", "temp", "memory")
             pr = temp_layer.dataProvider()
             pr.addAttributes([QgsField("Label", QVariant.String)])
@@ -1021,7 +1021,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             
             features_to_add = []
             for item in selected:
-                geom_dict = item.data(Qt.UserRole).get('geometry', {})
+                geom_dict = item.data(Qt.ItemDataRole.UserRole).get('geometry', {})
                 ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
                 if ogr_geom:
                     qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -1054,7 +1054,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         for layer_item in old_layers:
             project.removeMapLayer(layer_item)
 
-        feature_data = selected[0].data(Qt.UserRole)
+        feature_data = selected[0].data(Qt.ItemDataRole.UserRole)
         geom_dict = feature_data.get('geometry', {})
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
         if ogr_geom:
@@ -1069,7 +1069,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             
             features_to_add = []
             for item in selected:
-                feat_data = item.data(Qt.UserRole)
+                feat_data = item.data(Qt.ItemDataRole.UserRole)
                 if not feat_data: continue
                 g_dict = feat_data.get('geometry', {})
                 og = ogr.CreateGeometryFromJson(json.dumps(g_dict))
@@ -1122,27 +1122,27 @@ class RechercheDialog(QDialog, FORM_CLASS):
         map_item.setRect(0, 0, 205, 168)
         map_item.setExtent(self.iface.mapCanvas().extent())
         map_item.setFrameEnabled(True)
-        map_item.attemptMove(QgsLayoutPoint(10, 30, QgsUnitTypes.LayoutMillimeters))
-        map_item.attemptResize(QgsLayoutSize(205, 168, QgsUnitTypes.LayoutMillimeters))
+        map_item.attemptMove(QgsLayoutPoint(10, 30, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        map_item.attemptResize(QgsLayoutSize(205, 168, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(map_item)
         
         # 2. Title Header Banner
         title_item = QgsLayoutItemLabel(layout)
         title_item.setText("Extrait Cartographique - " + selected[0].text())
         from qgis.PyQt.QtGui import QFont
-        title_item.setFont(QFont("Arial", 14, QFont.Bold))
-        title_item.setVAlign(Qt.AlignVCenter)
-        title_item.setHAlign(Qt.AlignLeft)
-        title_item.attemptMove(QgsLayoutPoint(10, 8, QgsUnitTypes.LayoutMillimeters))
-        title_item.attemptResize(QgsLayoutSize(277, 18, QgsUnitTypes.LayoutMillimeters))
+        title_item.setFont(QFont("Arial", 14, QFont.Weight.Bold))
+        title_item.setVAlign(Qt.AlignmentFlag.AlignVCenter)
+        title_item.setHAlign(Qt.AlignmentFlag.AlignLeft)
+        title_item.attemptMove(QgsLayoutPoint(10, 8, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        title_item.attemptResize(QgsLayoutSize(277, 18, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(title_item)
         
         # 3. Sidebar Panel Shape
         sidebar_shape = QgsLayoutItemShape(layout)
         sidebar_shape.setShapeType(QgsLayoutItemShape.Rectangle)
         sidebar_shape.setFrameEnabled(True)
-        sidebar_shape.attemptMove(QgsLayoutPoint(220, 30, QgsUnitTypes.LayoutMillimeters))
-        sidebar_shape.attemptResize(QgsLayoutSize(67, 168, QgsUnitTypes.LayoutMillimeters))
+        sidebar_shape.attemptMove(QgsLayoutPoint(220, 30, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        sidebar_shape.attemptResize(QgsLayoutSize(67, 168, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(sidebar_shape)
         
         # 4. Orientation (North Arrow)
@@ -1160,16 +1160,16 @@ class RechercheDialog(QDialog, FORM_CLASS):
                 break
         if found_svg:
             north_arrow.setPicturePath(found_svg)
-        north_arrow.attemptMove(QgsLayoutPoint(243.5, 33, QgsUnitTypes.LayoutMillimeters))
-        north_arrow.attemptResize(QgsLayoutSize(20, 20, QgsUnitTypes.LayoutMillimeters))
+        north_arrow.attemptMove(QgsLayoutPoint(243.5, 33, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        north_arrow.attemptResize(QgsLayoutSize(20, 20, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(north_arrow)
         
         # 5. Legend
         legend_item = QgsLayoutItemLegend(layout)
         legend_item.setLinkedMap(map_item)
         legend_item.setTitle("Légende")
-        legend_item.attemptMove(QgsLayoutPoint(223, 58, QgsUnitTypes.LayoutMillimeters))
-        legend_item.attemptResize(QgsLayoutSize(61, 65, QgsUnitTypes.LayoutMillimeters))
+        legend_item.attemptMove(QgsLayoutPoint(223, 58, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        legend_item.attemptResize(QgsLayoutSize(61, 65, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(legend_item)
         
         # 6. Dynamic Scalebar adapting automatically to zoom level
@@ -1194,15 +1194,15 @@ class RechercheDialog(QDialog, FORM_CLASS):
                 break
                 
         if best_units >= 1000:
-            scalebar.setUnits(QgsUnitTypes.DistanceKilometers)
+            scalebar.setUnits(QgsUnitTypes.DistanceUnit.DistanceKilometers)
             scalebar.setUnitsPerSegment(best_units / 1000.0)
             scalebar.setUnitLabel("km")
         else:
-            scalebar.setUnits(QgsUnitTypes.DistanceMeters)
+            scalebar.setUnits(QgsUnitTypes.DistanceUnit.DistanceMeters)
             scalebar.setUnitsPerSegment(best_units)
             scalebar.setUnitLabel("m")
             
-        scalebar.attemptMove(QgsLayoutPoint(223, 128, QgsUnitTypes.LayoutMillimeters))
+        scalebar.attemptMove(QgsLayoutPoint(223, 128, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(scalebar)
         
         # 7. Source and Metadata Text
@@ -1221,15 +1221,15 @@ class RechercheDialog(QDialog, FORM_CLASS):
             f"GeoBan France (QGIS)"
         )
         source_item.setFont(QFont("Arial", 8))
-        source_item.attemptMove(QgsLayoutPoint(223, 146, QgsUnitTypes.LayoutMillimeters))
-        source_item.attemptResize(QgsLayoutSize(61, 50, QgsUnitTypes.LayoutMillimeters))
+        source_item.attemptMove(QgsLayoutPoint(223, 146, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
+        source_item.attemptResize(QgsLayoutSize(61, 50, QgsUnitTypes.LayoutUnit.LayoutMillimeters))
         layout.addLayoutItem(source_item)
         
         self.iface.openLayoutDesigner(layout)
         
     def perform_spatial_selection(self):
         active_layer = self.iface.activeLayer()
-        if not active_layer or active_layer.type() != QgsMapLayer.VectorLayer:
+        if not active_layer or active_layer.type() != QgsMapLayer.LayerType.VectorLayer:
             QMessageBox.warning(self, "Erreur", "Veuillez d'abord sélectionner une couche vectorielle (polygones, lignes, points) dans le panneau des couches de QGIS.")
             return
             
@@ -1238,7 +1238,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
             QMessageBox.warning(self, "Erreur", "Veuillez sélectionner un élément.")
             return
             
-        geom_dict = selected[0].data(Qt.UserRole).get('geometry', {})
+        geom_dict = selected[0].data(Qt.ItemDataRole.UserRole).get('geometry', {})
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
         if not ogr_geom: return
         
@@ -1317,7 +1317,7 @@ class dynaLocationMarker(QgsMapCanvasItem):
         from qgis.PyQt.QtGui import QPainter
         self.setCenter(self.map_pos)
         rect = QRectF(0 - self.halfsize, 0 - self.halfsize, self.size, self.size)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.setBrush(self.color) 
         painter.setPen(self.color) 
         painter.drawEllipse(QPointF(0,0), float(self.size), float(self.size))
@@ -1333,7 +1333,7 @@ class DialogReverseGeocodeTool(QgsMapToolEmitPoint):
         super().__init__(canvas)
         self.canvas = canvas
         self.dialog = dialog
-        self.setCursor(QCursor(Qt.CrossCursor))
+        self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
 
     def canvasReleaseEvent(self, e):
         point_map = self.toMapCoordinates(e.pos())

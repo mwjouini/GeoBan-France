@@ -33,7 +33,7 @@ class BanLocatorFilter(QgsLocatorFilter):
         return "Adresses BAN (France)"
 
     def flags(self):
-        return QgsLocatorFilter.FlagFast
+        return QgsLocatorFilter.Flag.FlagFast
 
     def fetchResults(self, search, context, feedback):
         if len(search) < 3:
