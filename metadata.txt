@@ -1,0 +1,17 @@
+[general]
+name=GeoBan France
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=Recherche d'adresses BAN et parcelles cadastrales IGN avec outils SIG et mise en page d'impression.
+version=1.0.0
+author=JOUINI Mohamed Wael
+email=mohamed.wael.jouini@gmail.com
+about=Extension QGIS puissante permettant la recherche instantanée d'adresses en France via la Base Adresse Nationale (BAN) et les parcelles cadastrales IGN (APICarto). Propose des outils SIG complets : périmètre de voisinage (buffer), sélection spatiale, mise en page d'impression A4 paysage, signets spatiaux, exports multi-formats (CSV, KML, couche mémoire) et géocodage inverse interactif sur la carte.
+tracker=https://github.com/mwjouini/GeoBan-France/issues
+repository=https://github.com/mwjouini/GeoBan-France
+homepage=https://github.com/mwjouini/GeoBan-France
+tags=adresse, ban, cadastre, ign, france, geocoding, print, buffer, sig
+category=Vector
+icon=icon.png
+experimental=False
+deprecated=False

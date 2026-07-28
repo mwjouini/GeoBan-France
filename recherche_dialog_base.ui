@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RechercheDialogBase</class>
+ <widget class="QDialog" name="RechercheDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>920</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Recherche d'adresse et cadastre</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <!-- ONGLET BAN -->
+     <widget class="QWidget" name="tabBAN">
+      <attribute name="title">
+       <string>BAN (Adresse)</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="searchLineEdit">
+           <property name="placeholderText">
+            <string>Saisissez une adresse...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="searchButton">
+           <property name="text">
+            <string>Rechercher</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_BAN_filters">
+         <item>
+          <widget class="QLineEdit" name="postcodeLineEdit">
+           <property name="placeholderText">
+            <string>Code Postal (ex: 75001)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="citycodeLineEdit">
+           <property name="placeholderText">
+            <string>Code INSEE Ville</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QListWidget" name="resultsListWidget"/>
+       </item>
+      </layout>
+     </widget>
+     <!-- ONGLET CADASTRE -->
+     <widget class="QWidget" name="tabCadastre">
+      <attribute name="title">
+       <string>IGN (Cadastre)</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="cadastreSearchModeCombo">
+         <item><property name="text"><string>Recherche par Identifiant (INSEE/Section/Numéro)</string></property></item>
+         <item><property name="text"><string>Recherche par Adresse</string></property></item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="cadastreAddressWidget">
+         <layout class="QVBoxLayout" name="verticalLayout_Cadastre_Addr">
+          <property name="leftMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLineEdit" name="cadastreAddressLineEdit">
+            <property name="placeholderText"><string>Saisissez une adresse...</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListWidget" name="cadastreAddressListWidget">
+            <property name="maximumHeight"><number>100</number></property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="cadastreIdWidget">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="leftMargin"><number>0</number></property>
+          <property name="topMargin"><number>0</number></property>
+          <property name="rightMargin"><number>0</number></property>
+          <property name="bottomMargin"><number>0</number></property>
+          <item>
+           <widget class="QLabel" name="labelInsee">
+           <property name="text">
+            <string>Code INSEE :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="inseeLineEdit">
+           <property name="placeholderText">
+            <string>Ex: 75101</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelSection">
+           <property name="text">
+            <string>Section :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="sectionLineEdit">
+           <property name="placeholderText">
+            <string>Ex: 0A</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelNumero">
+           <property name="text">
+            <string>Numéro :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="numeroLineEdit">
+           <property name="placeholderText">
+            <string>Ex: 123</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="searchCadastreButton">
+         <property name="text">
+          <string>Rechercher la parcelle</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="cadastreListWidget"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <!-- BOUTONS BAS -->
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zoomButton">
+       <property name="text">
+        <string>Zoomer &amp;&amp; Surligner</string>
+       </property>
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Fermer</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>RechercheDialogBase</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>348</x>
+     <y>277</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
