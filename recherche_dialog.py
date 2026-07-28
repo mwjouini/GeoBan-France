@@ -1378,16 +1378,42 @@ class DialogReverseGeocodeTool(QgsMapToolEmitPoint):
         self.dialog.activateIdentifierButton.setChecked(False)
         super().deactivate()
 
-    def on_finished(self, feature):
-        if not feature:
-            self.dialog.identifierResultText.setText("Aucune adresse trouvée à cet emplacement.")
+    def on_finished(self, result):
+        if not result or not isinstance(result, dict):
+            self.dialog.identifierResultText.setText("Aucune information trouvée à cet emplacement.")
             return
             
-        props = feature.get('properties', {})
-        label = props.get('label', 'Adresse inconnue')
-        context = props.get('context', '')
+        ban_feat = result.get('ban')
+        cad_feat = result.get('cadastre')
         
-        self.dialog.identifierResultText.setText(f"Adresse trouvée:\n{label}\n\nContexte:\n{context}")
+        text_parts = []
         
+        if ban_feat:
+            props = ban_feat.get('properties', {})
+            label = props.get('label', 'Adresse inconnue')
+            context = props.get('context', '')
+            postcode = props.get('postcode', '')
+            city = props.get('city', '')
+            dist = props.get('distance', '')
+            dist_str = f" (à {dist}m)" if dist is not None and dist != '' else ""
+            
+            text_parts.append(f"ADRESSE BAN{dist_str} :\n{label}\nCode postal : {postcode} | Ville : {city}\nContexte : {context}")
+
+        if cad_feat:
+            props_cad = cad_feat.get('properties', {})
+            code_insee = props_cad.get('code_insee', '')
+            section = props_cad.get('section', '')
+            numero = props_cad.get('numero', '')
+            contenance = props_cad.get('contenance', '')
+            
+            contenance_str = f"\nSurface : {contenance} m²" if contenance else ""
+            text_parts.append(f"PARCELLE CADASTRE (IGN) :\nCommune (INSEE) : {code_insee}\nSection : {section} | N° : {numero}{contenance_str}")
+
+        if text_parts:
+            full_text = "\n\n----------------------------------------\n\n".join(text_parts)
+            self.dialog.identifierResultText.setText(full_text)
+        else:
+            self.dialog.identifierResultText.setText("Aucune adresse ou parcelle trouvée à cet emplacement.")
+
     def on_error(self, err):
-        self.dialog.identifierResultText.setText(f"Erreur API: {err}")
+        self.dialog.identifierResultText.setText(f"Information : {err}")
