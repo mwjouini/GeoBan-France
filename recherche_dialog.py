@@ -495,8 +495,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         # Update Geometry Stats
         if has_selection and len(selected) == 1:
-            geom_dict = selected[0].data(Qt.UserRole).get('geometry', {})
-            import json
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -767,7 +765,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
         coords_list = []
         for item in selected:
             geom_dict = item.data(Qt.UserRole).get('geometry', {})
-            import json
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -779,8 +776,8 @@ class RechercheDialog(QDialog, FORM_CLASS):
                     else:
                         centroid = qgs_geom.centroid().asPoint()
                         coords_list.append(f"{centroid.x()}, {centroid.y()}")
-                except:
-                    pass
+                except Exception as err:
+                    QgsMessageLog.logMessage(f"Erreur calcul coordonnées: {str(err)}", "GeoBan France", QgsMessageLog.INFO)
                     
         text_to_copy = "\n".join(coords_list)
         QApplication.clipboard().setText(text_to_copy)
@@ -921,7 +918,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
             
         feature_data = selected[0].data(Qt.UserRole)
         geom = feature_data.get('geometry', {})
-        import json
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom))
         if ogr_geom:
             centroid = ogr_geom.Centroid()
@@ -936,7 +932,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
             return
             
         feature_data = selected[0].data(Qt.UserRole)
-        import json
         geojson_str = json.dumps(feature_data, indent=2, ensure_ascii=False)
         QApplication.clipboard().setText(geojson_str)
         self.iface.messageBar().pushMessage("Copié", "GeoJSON copié dans le presse-papiers.", level=0, duration=2)
@@ -986,7 +981,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
         features_to_add = []
         for item in selected:
             geom_dict = item.data(Qt.UserRole).get('geometry', {})
-            import json
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
@@ -998,8 +992,8 @@ class RechercheDialog(QDialog, FORM_CLASS):
                         f.setGeometry(buffered_geom)
                         f.setAttributes([item.text(), dist])
                         features_to_add.append(f)
-                except Exception as e:
-                    pass
+                except Exception as err:
+                    QgsMessageLog.logMessage(f"Erreur création buffer: {str(err)}", "GeoBan France", QgsMessageLog.INFO)
                     
         if features_to_add:
             pr.addFeatures(features_to_add)
@@ -1025,7 +1019,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
             temp_layer.updateFields()
             
             features_to_add = []
-            import json
             for item in selected:
                 geom_dict = item.data(Qt.UserRole).get('geometry', {})
                 ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
@@ -1057,8 +1050,8 @@ class RechercheDialog(QDialog, FORM_CLASS):
         # Add high-visibility print highlight layer in QGIS project
         project = QgsProject.instance()
         old_layers = project.mapLayersByName("Sélection GeoBan (Impression)")
-        for l in old_layers:
-            project.removeMapLayer(l)
+        for layer_item in old_layers:
+            project.removeMapLayer(layer_item)
 
         feature_data = selected[0].data(Qt.UserRole)
         geom_dict = feature_data.get('geometry', {})
@@ -1245,7 +1238,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
             return
             
         geom_dict = selected[0].data(Qt.UserRole).get('geometry', {})
-        import json
         ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
         if not ogr_geom: return
         
@@ -1301,7 +1293,6 @@ class dynaLocationMarker(QgsMapCanvasItem):
     def __init__(self, canvas, x, y, color):
         self.canvas = canvas
         self.color = color
-        from qgis.core import QgsPointXY
         self.map_pos = QgsPointXY(x, y)
         self.aniObject = dynaLocationMarker.aniObject()
         QgsMapCanvasItem.__init__(self, canvas)
@@ -1352,7 +1343,8 @@ class DialogReverseGeocodeTool(QgsMapToolEmitPoint):
         
         try:
             point_wgs84 = transform.transform(point_map)
-        except Exception:
+        except Exception as err:
+            QgsMessageLog.logMessage(f"Erreur transformation point: {str(err)}", "GeoBan France", QgsMessageLog.INFO)
             return
             
         lon, lat = point_wgs84.x(), point_wgs84.y()

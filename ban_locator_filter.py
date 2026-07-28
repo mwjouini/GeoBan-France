@@ -9,6 +9,12 @@ import urllib.request
 import urllib.parse
 from qgis.core import QgsLocatorFilter, QgsLocatorResult, QgsPointXY, QgsCoordinateTransform, QgsMessageLog, QgsProject, QgsCoordinateReferenceSystem
 
+def safe_urlopen(req, timeout=10):
+    url_str = req.full_url if hasattr(req, 'full_url') else str(req)
+    if not url_str.startswith('https://'):
+        raise ValueError("Seul le protocole HTTPS est autorisé.")
+    return urllib.request.urlopen(req, timeout=timeout)
+
 class BanLocatorFilter(QgsLocatorFilter):
     def __init__(self, plugin):
         QgsLocatorFilter.__init__(self, None)
@@ -36,7 +42,7 @@ class BanLocatorFilter(QgsLocatorFilter):
         url = "https://api-adresse.data.gouv.fr/search/?q=" + urllib.parse.quote(search) + "&limit=5"
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (QGIS GeoBan France)'})
-            with urllib.request.urlopen(req, timeout=10) as response:
+            with safe_urlopen(req, timeout=10) as response:
                 data = json.loads(response.read().decode('utf-8'))
                 features = data.get('features', [])
                 
