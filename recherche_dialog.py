@@ -17,7 +17,7 @@ from qgis.core import (
     QgsVectorLayer, QgsFeature, QgsField, QgsRasterLayer, QgsApplication, QgsBookmark, QgsReferencedRectangle,
     QgsDistanceArea, QgsPrintLayout, QgsLayoutItemMap, QgsLayoutItemLabel, QgsLayoutPoint, QgsLayoutSize, QgsUnitTypes, QgsFeatureRequest,
     QgsMapLayer, QgsLayoutItemLegend, QgsLayoutItemScaleBar, QgsLayoutItemPicture, QgsLayoutItemShape,
-    QgsSymbol, QgsSingleSymbolRenderer, QgsMarkerSymbol, QgsFillSymbol
+    QgsSymbol, QgsSingleSymbolRenderer, QgsMarkerSymbol, QgsFillSymbol, QgsMessageLog
 )
 from qgis.gui import QgsRubberBand, QgsVertexMarker, QgsMapCanvasItem, QgsProjectionSelectionWidget
 from qgis.PyQt.QtWidgets import QInputDialog, QLineEdit
@@ -495,6 +495,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         
         # Update Geometry Stats
         if has_selection and len(selected) == 1:
+            geom_dict = selected[0].data(Qt.UserRole).get('geometry', {})
             ogr_geom = ogr.CreateGeometryFromJson(json.dumps(geom_dict))
             if ogr_geom:
                 qgs_geom = QgsGeometry.fromWkt(ogr_geom.ExportToWkt())
