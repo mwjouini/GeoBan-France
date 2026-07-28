@@ -15,7 +15,7 @@ def safe_urlopen(req, timeout=10):
     url_str = req.full_url if hasattr(req, 'full_url') else str(req)
     if not url_str.startswith('https://'):
         raise ValueError("Seul le protocole HTTPS est autorisé.")
-    return urllib.request.urlopen(req, timeout=timeout)
+    return urllib.request.urlopen(req, timeout=timeout)  # nosec B310
 
 class BANSearchThread(QThread):
     finished = pyqtSignal(list)
