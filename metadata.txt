@@ -16,10 +16,10 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=Version 1.2 :
- - Filtre BAN par type de lieu : ajout du filtre spécifique (Adresses, Lieux-dits / Hameaux, Rues / Voies, Communes)
- - Recherche Cadastre IGN avancée : redirection automatique des lettres de section (ex: ZB) et filtrage ciblé des parcelles
- - Outil interactif Google Street View : activation de l'outil de carte pour ouvrir Street View sur n'importe quel point cliqué
- - Gestion des projections et coordonnées : conversion automatique et support transparent WGS84 / Lambert 93
- - Compatibilité PySide6 / Qt6 & QGIS 3 / 4 : résolution complète des énumérations Qt (Orientation, SelectionMode, ItemDataRole, etc.)
- - Interface & Ergonomie : ajout d'infobulles contextuelles, optimisation de la réactivité et corrections d'anomalies générales
+ - Nouvel onglet Import CSV / Excel : géocodage en lot de fichiers avec mapping des colonnes et création de couches vectorielles
+ - Nouvel onglet Coordonnées : recherche par coordonnées (Lambert 93 / WGS84) et géocodage inverse interactif sur la carte
+ - Outil Google Street View : repérage interactif sur le canevas QGIS avec ouverture directe dans le navigateur
+ - Filtre BAN par type de lieu : filtrage ciblé (Adresses avec numéro, Lieux-dits / Hameaux, Rues / Voies, Communes)
+ - Recherche Cadastre IGN avancée : détection automatique des lettres de section (ex: ZB) et filtrage précis des parcelles
+ - Compatibilité PySide6 / Qt6 & QGIS 3 / 4 : mise en conformité complète des énumérations et stabilité du plugin
 
