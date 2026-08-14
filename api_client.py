@@ -18,7 +18,7 @@ def safe_urlopen(url_str, timeout=10000):
     request.setHeader(QNetworkRequest.KnownHeaders.UserAgentHeader, 'Mozilla/5.0 (QGIS GeoBan France)')
     # Block until request completes
     err = req.get(request, forceRefresh=True)
-    if err != QgsBlockingNetworkRequest.NoError:
+    if err != QgsBlockingNetworkRequest.ErrorCode.NoError:
         raise Exception(f"Erreur réseau: {req.errorMessage()}")
     reply = req.reply()
     return reply.content().data().decode('utf-8')

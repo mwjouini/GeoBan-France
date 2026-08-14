@@ -69,7 +69,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         self.anim_checkbox.toggled.connect(self.toggle_animations)
         self.settings_layout.addWidget(self.anim_checkbox)
         
-        from qgis.PyQt.QtWidgets import QFormLayout, QComboBox, QSpinBox, QSlider
+        from qgis.PyQt.QtWidgets import QSpinBox, QSlider
         self.settings_form = QFormLayout()
         
         self.colorCombo = QComboBox()
@@ -770,14 +770,6 @@ class RechercheDialog(QDialog, FORM_CLASS):
         self.searchCadastreButton.setText("Rechercher la parcelle")
         QMessageBox.warning(self, "Erreur API", f"Une erreur est survenue: {error_msg}")
 
-    def toggle_identifier_tool(self):
-        if self.activateIdentifierButton.isChecked():
-            if self.map_tool is None:
-                self.map_tool = DialogReverseGeocodeTool(self.iface.mapCanvas(), self)
-            self.iface.mapCanvas().setMapTool(self.map_tool)
-        else:
-            if self.map_tool:
-                self.iface.mapCanvas().unsetMapTool(self.map_tool)
 
     def get_selected_items(self):
         current_tab_idx = self.tabWidget.currentIndex()
@@ -1277,7 +1269,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         """Ajoute ou supprime le calque bleu de couverture Google Street View de la carte QGIS."""
         layer_name = "Couverture Google Street View"
         project = QgsProject.instance()
-        existing_layers = [l for l in project.mapLayers().values() if l.name() == layer_name]
+        existing_layers = [layer for layer in project.mapLayers().values() if layer.name() == layer_name]
 
         if checked is None or isinstance(checked, bool) is False:
             checked = not bool(existing_layers)
@@ -1295,7 +1287,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
                     QMessageBox.warning(self, "Erreur", "Impossible de charger la couche de couverture Street View.")
         else:
             if existing_layers:
-                project.removeMapLayers([l.id() for l in existing_layers])
+                project.removeMapLayers([layer.id() for layer in existing_layers])
             if hasattr(self, 'streetViewCoverageButton'):
                 self.streetViewCoverageButton.setChecked(False)
                 self.streetViewCoverageButton.setText("Afficher Couverture Street View (Lignes bleues sur la carte)")
@@ -1807,7 +1799,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
         try:
             with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 lines = [f.readline() for _ in range(5)]
-            sample = "".join([l for l in lines if l])
+            sample = "".join([line for line in lines if line])
             if not sample:
                 return ';'
             first_line = lines[0]
@@ -1823,8 +1815,8 @@ class RechercheDialog(QDialog, FORM_CLASS):
                 return best
             if counts[' '] > 0:
                 return ' '
-        except Exception:
-            pass
+        except Exception as err:
+            QgsMessageLog.logMessage(f"GeoBan France - Détection séparateur: {err}", "GeoBan France")
         return ';'
 
     def get_selected_delimiter_char(self, filepath):
@@ -1898,7 +1890,7 @@ class RechercheDialog(QDialog, FORM_CLASS):
                                 x_vals.append(float(raw_x))
                                 y_vals.append(float(raw_y))
                             except ValueError:
-                                pass
+                                continue
             else:
                 layer = QgsVectorLayer(filepath, "sample", "ogr")
                 if layer.isValid():
@@ -1913,9 +1905,9 @@ class RechercheDialog(QDialog, FORM_CLASS):
                                 x_vals.append(float(raw_x))
                                 y_vals.append(float(raw_y))
                             except ValueError:
-                                pass
-        except Exception:
-            pass
+                                continue
+        except Exception as err:
+            QgsMessageLog.logMessage(f"GeoBan France - Détection SCR: {err}", "GeoBan France")
 
         if not x_vals or not y_vals:
             return "UNKNOWN"
