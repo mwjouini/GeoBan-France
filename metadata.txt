@@ -16,9 +16,10 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=Version 1.2 :
- - Ajout de la recherche BAN filtrée par type (Adresse, Lieu-dit / Hameau, Rue, Commune)
- - Amélioration de la recherche Cadastre IGN avec auto-détection de section et préfixe
- - Intégration interactive de Google Street View (outil de repérage et couche de couverture)
- - Outil de conversion de coordonnées et détection automatique des projections
- - Améliorations ergonomiques et corrections d'anomalies
+ - Filtre BAN par type de lieu : ajout du filtre spécifique (Adresses, Lieux-dits / Hameaux, Rues / Voies, Communes)
+ - Recherche Cadastre IGN avancée : redirection automatique des lettres de section (ex: ZB) et filtrage ciblé des parcelles
+ - Outil interactif Google Street View : activation de l'outil de carte pour ouvrir Street View sur n'importe quel point cliqué
+ - Gestion des projections et coordonnées : conversion automatique et support transparent WGS84 / Lambert 93
+ - Compatibilité PySide6 / Qt6 & QGIS 3 / 4 : résolution complète des énumérations Qt (Orientation, SelectionMode, ItemDataRole, etc.)
+ - Interface & Ergonomie : ajout d'infobulles contextuelles, optimisation de la réactivité et corrections d'anomalies générales
 
