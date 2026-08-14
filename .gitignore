@@ -8,7 +8,8 @@ __pycache__/
 .DS_Store
 *.log
 
-# Ignore local version history subfolders
+# Ignore local subfolder and version history
 v*/
 GeoBan France*/
 photos/
+geoban_france/
